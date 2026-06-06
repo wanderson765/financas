@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Minhas Finanças</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --green: #3fb950;
+      --green-bg: #0d2119;
+      --green-border: #1f6335;
+      --red: #f85149;
+      --red-bg: #2d0f0f;
+      --red-border: #6e2020;
+      --yellow: #d29922;
+      --blue: #58a6ff;
+      --radius: 12px;
+      --nav-h: 68px;
+      --header-h: 58px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-title { font-size: 17px; font-weight: 700; color: var(--green); letter-spacing: -0.3px; }
+    .month-nav { display: flex; align-items: center; gap: 12px; }
+    .month-nav button {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      width: 34px; height: 34px; border-radius: 8px; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .month-nav button:active { opacity: 0.7; }
+    .month-label { font-size: 15px; font-weight: 600; min-width: 120px; text-align: center; }
+
+    /* ── Bottom Tabs ── */
+    .tabs {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      background: var(--surface); border-top: 1px solid var(--border);
+      height: var(--nav-h); display: flex; z-index: 100;
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 4px; cursor: pointer;
+      color: var(--text2); font-size: 10px; font-weight: 500;
+      border: none; background: none; padding: 8px 0;
+    }
+    .tab.active { color: var(--green); }
+    .tab svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Content ── */
+    .content {
+      padding: 14px 14px calc(var(--nav-h) + 16px);
+      min-height: calc(100vh - var(--header-h));
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Summary Cards ── */
+    .sobra-card {
+      border-radius: var(--radius); padding: 18px 16px; margin-bottom: 12px;
+      text-align: center; border: 1px solid;
+    }
+    .sobra-card.pos { background: var(--green-bg); border-color: var(--green-border); }
+    .sobra-card.neg { background: var(--red-bg); border-color: var(--red-border); }
+    .sobra-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 4px; }
+    .sobra-value { font-size: 30px; font-weight: 800; }
+    .sobra-value.pos { color: var(--green); }
+    .sobra-value.neg { color: var(--red); }
+
+    .summary-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .sum-card {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; text-align: center;
+    }
+    .sum-label { font-size: 11px; color: var(--text2); margin-bottom: 3px; }
+    .sum-value { font-size: 16px; font-weight: 700; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--text2); margin-bottom: 12px;
+    }
+    .total-row {
+      display: flex; justify-content: space-between;
+      padding: 10px 0 0; border-top: 1px solid var(--border);
+      font-weight: 700; font-size: 14px;
+    }
+
+    /* ── Budget Items ── */
+    .bitem {
+      display: flex; align-items: center;
+      padding: 9px 0; border-bottom: 1px solid var(--surface2);
+    }
+    .bitem:last-of-type { border-bottom: none; }
+    .bitem-icon { margin-right: 8px; font-size: 16px; flex-shrink: 0; }
+    .bitem-name { flex: 1; font-size: 14px; }
+    .bitem-val { font-size: 14px; font-weight: 600; margin-right: 10px; }
+    .bitem-actions { display: flex; gap: 4px; }
+    .btn-icon {
+      background: none; border: none; color: var(--text2);
+      cursor: pointer; padding: 5px; border-radius: 6px; font-size: 14px;
+      line-height: 1;
+    }
+    .btn-icon:active { background: var(--surface2); }
+
+    .btn-add {
+      width: 100%; background: transparent;
+      border: 1px dashed var(--border); color: var(--text2);
+      padding: 10px; border-radius: 8px; font-size: 13px;
+      cursor: pointer; margin-top: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-add:active { background: var(--surface2); }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: calc(var(--nav-h) + 14px); right: 14px;
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--green); color: #000; border: none;
+      font-size: 26px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(63,185,80,0.45); z-index: 99;
+    }
+
+    /* ── Transactions ── */
+    .tx-group { margin-bottom: 16px; }
+    .tx-day {
+      font-size: 12px; color: var(--text2); font-weight: 600;
+      padding: 0 2px 8px;
+      display: flex; justify-content: space-between;
+    }
+    .tx-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 12px; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 11px; cursor: pointer;
+    }
+    .tx-item:active { opacity: 0.8; }
+    .tx-ico {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-desc { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-cat { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .tx-val { font-size: 15px; font-weight: 700; color: var(--red); flex-shrink: 0; }
+
+    /* ── Category Progress ── */
+    .cat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
+    }
+    .cat-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .cat-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .cat-pct { font-size: 12px; font-weight: 700; }
+    .progress-track { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .cat-nums { display: flex; justify-content: space-between; margin-top: 7px; }
+    .cat-nums span { font-size: 12px; color: var(--text2); }
+    .cat-saldo { font-size: 13px; font-weight: 700; }
+
+    /* ── Empty State ── */
+    .empty { text-align: center; color: var(--text2); padding: 50px 20px; font-size: 14px; }
+    .empty-icon { font-size: 42px; margin-bottom: 12px; }
+
+    /* ── Overlay/Sheet ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      z-index: 200; display: none; align-items: flex-end; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .sheet {
+      background: var(--surface); width: 100%; max-width: 430px;
+      border-radius: 20px 20px 0 0; padding: 20px 20px 40px;
+      max-height: 88vh; overflow-y: auto;
+    }
+    .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+    .sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 18px; }
+
+    /* ── Form ── */
+    .fg { margin-bottom: 14px; }
+    .fl { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 5px; display: block; }
+    .fi {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 13px; border-radius: 10px; font-size: 15px; outline: none;
+    }
+    .fi:focus { border-color: var(--green); }
+    select.fi { appearance: none; }
+    .btn-primary {
+      width: 100%; background: var(--green); color: #000; border: none;
+      padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700;
+      cursor: pointer; margin-top: 6px;
+    }
+    .btn-primary:active { opacity: 0.85; }
+    .btn-danger {
+      width: 100%; background: transparent; color: var(--red);
+      border: 1px solid var(--red-border); padding: 12px; border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
+    }
+    .btn-danger:active { opacity: 0.8; }
+
+    /* ── Icon Grid ── */
+    .icon-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 6px; }
+    .icon-btn {
+      aspect-ratio: 1; background: var(--surface2); border: 2px solid transparent;
+      border-radius: 9px; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .icon-btn.sel { border-color: var(--green); background: var(--green-bg); }
+
+    /* ── Color Row ── */
+    .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .color-btn {
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: border-color 0.15s;
+    }
+    .color-btn.sel { border-color: #fff; }
+
+    /* ── Copy month btn ── */
+    .copy-btn {
+      width: 100%; background: transparent; border: 1px solid var(--border);
+      color: var(--text2); padding: 10px; border-radius: 8px; font-size: 13px;
+      cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .copy-btn:active { background: var(--surface2); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span class="app-title" id="app-title-display" onclick="editAppTitle()" style="cursor:pointer">💰 Minhas Finanças</span>
+  <div class="month-nav">
+    <button onclick="prevMonth()">‹</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button onclick="nextMonth()">›</button>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="content">
+
+  <!-- ORÇAMENTO -->
+  <div class="page active" id="page-orcamento">
+    <div id="sobra-wrap"></div>
+    <div class="summary-row">
+      <div class="sum-card">
+        <div class="sum-label">Receitas</div>
+        <div class="sum-value" id="tot-receitas" style="color:var(--green)">R$ 0</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Orçado</div>
+        <div class="sum-value" id="tot-despesas" style="color:var(--red)">R$ 0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Receitas</div>
+      <div id="list-receitas"></div>
+      <button class="btn-add" onclick="openSheet('receita')">＋ Adicionar receita</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Categorias de Despesa</div>
+      <div id="list-cats-orc"></div>
+      <button class="btn-add" onclick="openSheet('categoria')">＋ Adicionar categoria</button>
+    </div>
+  </div>
+
+  <!-- LANÇAMENTOS -->
+  <div class="page" id="page-lancamentos">
+    <div id="list-lancs"></div>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div class="page" id="page-categorias">
+    <div id="list-cats-saldo"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openSheet('lancamento')" style="display:none">＋</button>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('orcamento')" id="tab-orcamento">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    Orçamento
+  </button>
+  <button class="tab" onclick="switchTab('lancamentos')" id="tab-lancamentos">
+    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M15 12H9m6 4H9"/></svg>
+    Lançamentos
+  </button>
+  <button class="tab" onclick="switchTab('categorias')" id="tab-categorias">
+    <svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    Categorias
+  </button>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheet-body"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────
+const STORAGE_KEY = 'fin_v2';
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const ICONS = ['🚗','🍔','🎮','💊','🏠','💡','👕','✈️','📚','💪','🎵','🏥','🛒','☕','🐶','💼','🎓','⛽','💸','🎁','🍺','🎯','🔧','🌙','🏋️','🎭','📱','🍕'];
+const COLORS = ['#3fb950','#58a6ff','#f78166','#d29922','#bc8cff','#ec4899','#06b6d4','#fb923c'];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let now = new Date();
+let curYear = now.getFullYear();
+let curMonth = now.getMonth();
+let activeTab = 'orcamento';
+let editId = null;
+let editType = null;
+
+// ─────────────────────────────────────────────
+// STORAGE
+// ─────────────────────────────────────────────
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function monthKey() { return `${curYear}-${String(curMonth+1).padStart(2,'0')}`; }
+function monthData() {
+  const s = load();
+  if (!s[monthKey()]) { s[monthKey()] = {receitas:[],categorias:[],lancamentos:[]}; save(s); }
+  return s[monthKey()];
+}
+function saveMonth(d) { const s = load(); s[monthKey()] = d; save(s); }
+function appMeta() { const s = load(); return s._meta || {title:'💰 Minhas Finanças'}; }
+function saveAppMeta(m) { const s = load(); s._meta = m; save(s); }
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function brl(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function pctColor(p) { return p < 60 ? '#3fb950' : p < 85 ? '#d29922' : '#f85149'; }
+
+// ─────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────
+function updateHeader() {
+  document.getElementById('monthLabel').textContent = `${MONTHS[curMonth].slice(0,3)} ${curYear}`;
+  const meta = appMeta();
+  document.getElementById('app-title-display').textContent = meta.title || '💰 Minhas Finanças';
+}
+function prevMonth() { curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } refresh(); }
+function nextMonth() { curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } refresh(); }
+
+function switchTab(t) {
+  activeTab = t;
+  ['orcamento','lancamentos','categorias'].forEach(id => {
+    document.getElementById(`page-${id}`).classList.toggle('active', id === t);
+    document.getElementById(`tab-${id}`).classList.toggle('active', id === t);
+  });
+  document.getElementById('fab').style.display = t === 'lancamentos' ? 'flex' : 'none';
+  renderTab();
+}
+
+function refresh() { updateHeader(); renderTab(); }
+function renderTab() {
+  if (activeTab === 'orcamento') renderOrc();
+  else if (activeTab === 'lancamentos') renderLancs();
+  else renderCats();
+}
+
+// ─────────────────────────────────────────────
+// RENDER: ORÇAMENTO
+// ─────────────────────────────────────────────
+function renderOrc() {
+  const d = monthData();
+  const totRec = d.receitas.reduce((s,r) => s + (r.valor||0), 0);
+  const totDesp = d.categorias.reduce((s,c) => s + (c.orcamento||0), 0);
+  const sobra = totRec - totDesp;
+
+  document.getElementById('tot-receitas').textContent = brl(totRec);
+  document.getElementById('tot-despesas').textContent = brl(totDesp);
+
+  const sw = document.getElementById('sobra-wrap');
+  sw.innerHTML = `<div class="sobra-card ${sobra >= 0 ? 'pos' : 'neg'}">
+    <div class="sobra-label">Sobra do Mês</div>
+    <div class="sobra-value ${sobra >= 0 ? 'pos' : 'neg'}">${brl(sobra)}</div>
+  </div>`;
+
+  // Receitas
+  const lr = document.getElementById('list-receitas');
+  if (!d.receitas.length) {
+    lr.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:6px 0">Nenhuma receita cadastrada</div>';
+  } else {
+    lr.innerHTML = d.receitas.map(r => `
+      <div class="bitem">
+        <span class="bitem-icon">💵</span>
+        <span class="bitem-name">${esc(r.nome)}</span>
+        <span class="bitem-val" style="color:var(--green)">${brl(r.valor)}</span>
+        <div class="bitem-actions">
+          <button class="btn-icon" onclick="openEditReceita('${r.id}')">✏️</button>
+          <button class="btn-icon" onclick="delReceita('${r.id}')">🗑️</button>
+        </div>
+      </div>`).join('') + `<div class="total-row"><span>Total</span><span style="color:var(--green)">${brl(totRec)}</span></div>`;
+  }
+
+  // Categorias
+  const lc = document.getElementById('list-cats-orc');
+  // Check if this is a fresh month with no data and previous month has categories
+  const prevKey = getPrevMonthKey();
+  const s = load();
+  const hasPrev = s[prevKey] && (s[prevKey].receitas?.length || s[prevKey].categorias?.length);
+  const isEmpty = !d.receitas.length && !d.categorias.length;
+
+  let copyBtn = '';
+  if (isEmpty && hasPrev) {
+    copyBtn = `<button class="copy-btn" onclick="copyFromPrev()">📋 Copiar orçamento do mês anterior</button>`;
+  }
+
+  if (!d.categorias.length) {
+    lc.innerHTML = copyBtn + '<div style="color:var(--text2);font-size:13px;padding:6px 0">Nenhuma categoria cadastrada</div>';
+  } else {
+    lc.innerHTML = copyBtn + d.categorias.map(c => `
+      <div class="bitem">
+        <span class="bitem-icon">${c.icon||'📌'}</span>
+        <span class="bitem-name">${esc(c.nome)}</span>
+        <span class="bitem-val" style="color:var(--red)">${brl(c.orcamento)}</span>
+        <div class="bitem-actions">
+          <button class="btn-icon" onclick="openEditCat('${c.id}')">✏️</button>
+          <button class="btn-icon" onclick="delCat('${c.id}')">🗑️</button>
+        </div>
+      </div>`).join('') + `<div class="total-row"><span>Total</span><span style="color:var(--red)">${brl(totDesp)}</span></div>`;
+  }
+}
+
+function getPrevMonthKey() {
+  let m = curMonth - 1, y = curYear;
+  if (m < 0) { m = 11; y--; }
+  return `${y}-${String(m+1).padStart(2,'0')}`;
+}
+
+function copyFromPrev() {
+  const s = load();
+  const prev = s[getPrevMonthKey()];
+  if (!prev) return;
+  const d = monthData();
+  d.receitas = prev.receitas.map(r => ({...r, id: uid()}));
+  d.categorias = prev.categorias.map(c => ({...c, id: uid()}));
+  saveMonth(d);
+  renderOrc();
+}
+
+// ─────────────────────────────────────────────
+// RENDER: LANÇAMENTOS
+// ─────────────────────────────────────────────
+function renderLancs() {
+  const d = monthData();
+  const cont = document.getElementById('list-lancs');
+
+  if (!d.lancamentos.length) {
+    cont.innerHTML = `<div class="empty">
+      <div class="empty-icon">📋</div>
+      <div style="font-weight:600;margin-bottom:6px">Nenhum lançamento este mês</div>
+      <div style="font-size:13px">Toque no ＋ para registrar uma despesa</div>
+    </div>`;
+    return;
+  }
+
+  const sorted = [...d.lancamentos].sort((a,b) => b.data.localeCompare(a.data));
+  const groups = {};
+  sorted.forEach(l => { if (!groups[l.data]) groups[l.data] = []; groups[l.data].push(l); });
+
+  cont.innerHTML = Object.entries(groups).map(([date, items]) => {
+    const [yr,mo,dy] = date.split('-');
+    const dayTot = items.reduce((s,i) => s + i.valor, 0);
+    return `<div class="tx-group">
+      <div class="tx-day">
+        <span>${dy}/${mo}/${yr}</span>
+        <span style="color:var(--red)">${brl(dayTot)}</span>
+      </div>
+      ${items.map(l => {
+        const cat = d.categorias.find(c => c.id === l.catId) || {icon:'💳',nome:'Sem categoria',cor:'#30363d'};
+        const bg = (cat.cor||'#30363d') + '25';
+        return `<div class="tx-item" onclick="openEditLanc('${l.id}')">
+          <div class="tx-ico" style="background:${bg};color:${cat.cor||'#8b949e'}">${cat.icon||'💳'}</div>
+          <div class="tx-info">
+            <div class="tx-desc">${esc(l.desc)}</div>
+            <div class="tx-cat">${esc(cat.nome)}</div>
+          </div>
+          <div class="tx-val">−${brl(l.valor)}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+// RENDER: CATEGORIAS
+// ─────────────────────────────────────────────
+function renderCats() {
+  const d = monthData();
+  const cont = document.getElementById('list-cats-saldo');
+
+  if (!d.categorias.length) {
+    cont.innerHTML = `<div class="empty">
+      <div class="empty-icon">📊</div>
+      <div style="font-weight:600;margin-bottom:6px">Nenhuma categoria</div>
+      <div style="font-size:13px">Adicione categorias no Orçamento</div>
+    </div>`;
+    return;
+  }
+
+  let totOrc = 0, totUsado = 0;
+
+  const html = d.categorias.map(cat => {
+    const usado = d.lancamentos
+      .filter(l => l.catId === cat.id)
+      .reduce((s,l) => s + l.valor, 0);
+    const saldo = (cat.orcamento||0) - usado;
+    const pct = cat.orcamento > 0 ? Math.min((usado / cat.orcamento) * 100, 100) : 0;
+    const cor = pctColor(pct);
+    totOrc += cat.orcamento||0;
+    totUsado += usado;
+
+    return `<div class="cat-card">
+      <div class="cat-head">
+        <div class="cat-name">
+          <span>${cat.icon||'📌'}</span>
+          ${esc(cat.nome)}
+        </div>
+        <span class="cat-pct" style="color:${cor}">${Math.round(pct)}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%;background:${cor}"></div>
+      </div>
+      <div class="cat-nums">
+        <span>Orçamento: ${brl(cat.orcamento)}</span>
+        <span>Usado: <b style="color:${cor}">${brl(usado)}</b></span>
+      </div>
+      <div style="text-align:right;margin-top:5px">
+        <span class="cat-saldo" style="color:${saldo>=0?'var(--green)':'var(--red)'}">Saldo: ${brl(saldo)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const totSaldo = totOrc - totUsado;
+  cont.innerHTML = html + `<div class="card" style="margin-top:4px">
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+      <span style="color:var(--text2)">Total Orçado</span><span>${brl(totOrc)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+      <span style="color:var(--text2)">Total Utilizado</span>
+      <span style="color:var(--red)">${brl(totUsado)}</span>
+    </div>
+    <div class="total-row">
+      <span>Saldo Total</span>
+      <span style="color:${totSaldo>=0?'var(--green)':'var(--red)'}">${brl(totSaldo)}</span>
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// SHEETS
+// ─────────────────────────────────────────────
+function openSheet(type, item = {}) {
+  editType = type; editId = item.id || null;
+  const body = document.getElementById('sheet-body');
+
+  if (type === 'receita') {
+    body.innerHTML = `
+      <div class="sheet-title">${editId ? 'Editar' : 'Nova'} Receita</div>
+      <div class="fg"><label class="fl">Nome</label>
+        <input class="fi" id="f-nome" type="text" placeholder="Ex: Salário" value="${esc(item.nome||'')}" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Valor (R$)</label>
+        <input class="fi" id="f-valor" type="number" step="0.01" min="0" placeholder="0,00" value="${item.valor||''}"></div>
+      <button class="btn-primary" onclick="saveReceita()">Salvar</button>
+      ${editId ? `<button class="btn-danger" onclick="delReceita('${editId}');closeSheet()">Excluir</button>` : ''}`;
+    setTimeout(() => document.getElementById('f-nome').focus(), 150);
+
+  } else if (type === 'categoria') {
+    const si = item.icon || ICONS[0];
+    const sc = item.cor || COLORS[0];
+    body.innerHTML = `
+      <div class="sheet-title">${editId ? 'Editar' : 'Nova'} Categoria</div>
+      <div class="fg"><label class="fl">Nome</label>
+        <input class="fi" id="f-nome" type="text" placeholder="Ex: Uber, Alimentação..." value="${esc(item.nome||'')}" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Orçamento mensal (R$)</label>
+        <input class="fi" id="f-orc" type="number" step="0.01" min="0" placeholder="0,00" value="${item.orcamento||''}"></div>
+      <div class="fg"><label class="fl">Ícone</label>
+        <div class="icon-grid">${ICONS.map(ic =>
+          `<button class="icon-btn${ic===si?' sel':''}" onclick="selIcon('${ic}')" data-i="${ic}">${ic}</button>`
+        ).join('')}</div>
+        <input type="hidden" id="f-icon" value="${si}"></div>
+      <div class="fg"><label class="fl">Cor</label>
+        <div class="color-row">${COLORS.map(cor =>
+          `<button class="color-btn${cor===sc?' sel':''}" onclick="selColor('${cor}')" data-c="${cor}" style="background:${cor}"></button>`
+        ).join('')}</div>
+        <input type="hidden" id="f-cor" value="${sc}"></div>
+      <button class="btn-primary" onclick="saveCat()">Salvar</button>
+      ${editId ? `<button class="btn-danger" onclick="delCat('${editId}')">Excluir</button>` : ''}`;
+    setTimeout(() => document.getElementById('f-nome').focus(), 150);
+
+  } else if (type === 'lancamento') {
+    const d = monthData();
+    const opts = d.categorias.map(c =>
+      `<option value="${c.id}"${item.catId===c.id?' selected':''}>${c.icon||''} ${esc(c.nome)}</option>`
+    ).join('');
+    body.innerHTML = `
+      <div class="sheet-title">${editId ? 'Editar' : 'Novo'} Lançamento</div>
+      <div class="fg"><label class="fl">Descrição</label>
+        <input class="fi" id="f-desc" type="text" placeholder="Ex: Uber ida trabalho" value="${esc(item.desc||'')}" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Categoria</label>
+        <select class="fi" id="f-cat"><option value="">Selecionar...</option>${opts}</select></div>
+      <div class="fg"><label class="fl">Valor (R$)</label>
+        <input class="fi" id="f-valor" type="number" step="0.01" min="0" placeholder="0,00" value="${item.valor||''}"></div>
+      <div class="fg"><label class="fl">Data</label>
+        <input class="fi" id="f-data" type="date" value="${item.data||today()}"></div>
+      <button class="btn-primary" onclick="saveLanc()">Salvar</button>
+      ${editId ? `<button class="btn-danger" onclick="delLanc('${editId}')">Excluir</button>` : ''}`;
+    setTimeout(() => document.getElementById('f-desc').focus(), 150);
+
+  } else if (type === 'app-title') {
+    const meta = appMeta();
+    body.innerHTML = `
+      <div class="sheet-title">Nome do App</div>
+      <div class="fg"><label class="fl">Título exibido no cabeçalho</label>
+        <input class="fi" id="f-title" type="text" placeholder="💰 Minhas Finanças" value="${esc(meta.title||'')}"></div>
+      <button class="btn-primary" onclick="saveAppTitle()">Salvar</button>`;
+    setTimeout(() => document.getElementById('f-title').focus(), 150);
+  }
+
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeSheet() { document.getElementById('overlay').classList.remove('open'); editId = null; editType = null; }
+function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeSheet(); }
+
+function selIcon(ic) {
+  document.getElementById('f-icon').value = ic;
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.toggle('sel', b.dataset.i === ic));
+}
+function selColor(cor) {
+  document.getElementById('f-cor').value = cor;
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.toggle('sel', b.dataset.c === cor));
+}
+
+// ─────────────────────────────────────────────
+// CRUD
+// ─────────────────────────────────────────────
+function saveReceita() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const valor = parseFloat(document.getElementById('f-valor').value) || 0;
+  if (!nome) { alert('Informe o nome'); return; }
+  const d = monthData();
+  if (editId) {
+    const i = d.receitas.findIndex(r => r.id === editId);
+    if (i >= 0) d.receitas[i] = {...d.receitas[i], nome, valor};
+  } else {
+    d.receitas.push({id: uid(), nome, valor});
+  }
+  saveMonth(d); closeSheet(); renderOrc();
+}
+
+function openEditReceita(id) { const d = monthData(); const r = d.receitas.find(r => r.id === id); if(r) openSheet('receita', r); }
+function delReceita(id) {
+  if (!confirm('Excluir esta receita?')) return;
+  const d = monthData(); d.receitas = d.receitas.filter(r => r.id !== id);
+  saveMonth(d); closeSheet(); renderOrc();
+}
+
+function saveCat() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const orcamento = parseFloat(document.getElementById('f-orc').value) || 0;
+  const icon = document.getElementById('f-icon').value;
+  const cor = document.getElementById('f-cor').value;
+  if (!nome) { alert('Informe o nome'); return; }
+  const d = monthData();
+  if (editId) {
+    const i = d.categorias.findIndex(c => c.id === editId);
+    if (i >= 0) d.categorias[i] = {...d.categorias[i], nome, orcamento, icon, cor};
+  } else {
+    d.categorias.push({id: uid(), nome, orcamento, icon, cor});
+  }
+  saveMonth(d); closeSheet(); renderOrc();
+}
+
+function openEditCat(id) { const d = monthData(); const c = d.categorias.find(c => c.id === id); if(c) openSheet('categoria', c); }
+function delCat(id) {
+  if (!confirm('Excluir esta categoria? Lançamentos perderão o vínculo.')) return;
+  const d = monthData();
+  d.categorias = d.categorias.filter(c => c.id !== id);
+  d.lancamentos = d.lancamentos.map(l => l.catId === id ? {...l, catId: null} : l);
+  saveMonth(d); closeSheet(); renderOrc();
+}
+
+function saveLanc() {
+  const desc = document.getElementById('f-desc').value.trim();
+  const catId = document.getElementById('f-cat').value || null;
+  const valor = parseFloat(document.getElementById('f-valor').value) || 0;
+  const data = document.getElementById('f-data').value;
+  if (!desc) { alert('Informe a descrição'); return; }
+  if (!valor) { alert('Informe o valor'); return; }
+  if (!data) { alert('Informe a data'); return; }
+  const d = monthData();
+  if (editId) {
+    const i = d.lancamentos.findIndex(l => l.id === editId);
+    if (i >= 0) d.lancamentos[i] = {...d.lancamentos[i], desc, catId, valor, data};
+  } else {
+    d.lancamentos.push({id: uid(), desc, catId, valor, data});
+  }
+  saveMonth(d); closeSheet();
+  renderLancs();
+  if (activeTab !== 'lancamentos') renderCats();
+}
+
+function openEditLanc(id) { const d = monthData(); const l = d.lancamentos.find(l => l.id === id); if(l) openSheet('lancamento', l); }
+function delLanc(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  const d = monthData(); d.lancamentos = d.lancamentos.filter(l => l.id !== id);
+  saveMonth(d); closeSheet(); renderLancs();
+}
+
+function editAppTitle() { openSheet('app-title'); }
+function saveAppTitle() {
+  const title = document.getElementById('f-title').value.trim() || '💰 Minhas Finanças';
+  saveAppMeta({title});
+  closeSheet();
+  updateHeader();
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+refresh();
+</script>
+</body>
+</html>
