@@ -561,6 +561,49 @@
       .auth-form .auth-logo { display: none; }
     }
 
+    /* ══════════ VERSÃO SIMPLIFICADA (meio-termo) ══════════ */
+    /* menos letras maiúsculas espaçadas: textos normais, mais leves */
+    .sc, .eyebrow, .fl, .chart-legend, .filter-sum, .bcard-foot { letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 600; }
+    .link, .btn-add, .btn-soft, .btn-ghost, .copy-btn, .btn-danger, .install-go, .pw button, .toast button, .seg button {
+      letter-spacing: 0; text-transform: none; font-size: 13.5px; font-weight: 700;
+    }
+    .btn-primary { letter-spacing: 0; text-transform: none; font-size: 15px; font-weight: 800; }
+    .tab { letter-spacing: 0; text-transform: none; font-size: 10.5px; font-weight: 600; }
+    .app-title { letter-spacing: .02em; text-transform: none; font-size: 15px; font-weight: 700; color: var(--text); }
+    .app-title::before { color: var(--gold); }
+    .status { letter-spacing: 0; text-transform: none; font-size: 11.5px; font-weight: 700; }
+    .fl { color: var(--text2); margin-bottom: 7px; }
+    .card-title { font-size: 22px; }
+    .card { margin-top: 28px; }
+
+    /* cartão do saldo: limpo, sem chip nem brilho */
+    .bcard { min-height: 0; padding: 20px 20px 18px; }
+    .bcard::after { display: none; }
+    .bcard-top .lbl { font-size: 13px; color: var(--text2); font-weight: 600; }
+    .bcard .bal-v { margin-top: 10px; font-size: 52px; }
+    .meter { height: 3px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; margin: 18px 0 8px; }
+    .meter i { display: block; height: 100%; border-radius: 3px; transition: width 1s var(--ease); }
+    .meter-legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); }
+    .meter-legend span:last-child { color: var(--gold2); font-weight: 600; }
+    .mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .mini span { display: block; font-size: 11.5px; color: var(--text2); }
+    .mini b { display: block; font-family: var(--serif); font-size: 19px; font-weight: 500; margin-top: 2px; white-space: nowrap; }
+    .mini div:nth-child(1) b { color: var(--green); }
+    .mini div:nth-child(3) b { color: var(--red); }
+    .home-cats .row { padding: 11px 0; }
+    .home-cats .bar-track { margin-top: 8px; }
+    .home-cats .mono, .recent-card .mono { width: 34px; height: 34px; font-size: 15px; }
+
+    @media (min-width: 1000px) {
+      #page-inicio > .bcard { grid-column: span 7; min-height: 0; padding: 28px 30px 24px; }
+      #page-inicio > .home-cats { grid-column: span 5; margin-top: 0; }
+      #page-inicio > .recent-card { margin-top: 24px; }
+      .bcard .bal-v { font-size: 72px; }
+      .tab { font-size: 13.5px; }
+      .fab-label { letter-spacing: 0; text-transform: none; font-size: 14px; }
+      .side-brand span { letter-spacing: 0; text-transform: none; font-size: 15px; color: var(--text); font-weight: 700; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -697,6 +740,7 @@ const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const brl = v => fmt.format(v || 0);
+const brl0 = v => 'R$ ' + Math.round(v || 0).toLocaleString('pt-BR');
 const brlShort = v => Math.abs(v) >= 10000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : brl(v);
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const sum = (arr, f) => arr.reduce((s, x) => s + (Number(x[f]) || 0), 0);
@@ -849,26 +893,30 @@ function renderInicio() {
   const pct = O > 0 ? G / O * 100 : 0;
   const empty = !d.receitas.length && !d.categorias.length && !d.lancamentos.length;
 
-  let badge;
-  if (!O) badge = ['muted', 'Sem orçamento'];
-  else if (pct > 100) badge = ['red', 'Estourado'];
-  else if (pct >= 85) badge = ['red', 'No limite'];
-  else if (pct >= 60) badge = ['yellow', 'Atenção'];
-  else badge = ['gold', 'Em dia'];
-  if (O && pct <= 100 && isCurrentMonth()) {
-    const dim = daysIn(curYear, curMonth), diff = G - O * NOW.getDate() / dim;
-    if (diff > 0 && badge[0] === 'gold') badge = ['yellow', 'Acima do ritmo'];
+  let badge = null;
+  if (O) {
+    if (pct > 100) badge = ['red', 'Estourado'];
+    else if (pct >= 85) badge = ['red', 'No limite'];
+    else if (isCurrentMonth() && G > O * NOW.getDate() / daysIn(curYear, curMonth)) badge = ['yellow', 'Acima do ritmo'];
+    else badge = ['gold', 'Em dia'];
   }
+  let hint = '';
+  if (O && isCurrentMonth()) {
+    const restam = daysIn(curYear, curMonth) - NOW.getDate() + 1;
+    hint = `${brl(Math.max(O - G, 0) / restam)} por dia`;
+  } else if (O) hint = `${Math.round(pct)}% usado`;
 
   const card = `
     <section class="bcard ${saldo < 0 ? 'neg' : ''}">
-      ${guilloche()}
-      <div class="bcard-top"><div class="chipcard"></div><span class="status tone-${badge[0]}">${badge[1]}</span></div>
-      <div class="bal">
-        <div class="sc">Saldo de ${MONTHS[curMonth].toLowerCase()}</div>
-        <div class="bal-v" id="hv-saldo">${balHTML(lastVals.saldo ?? 0)}</div>
-      </div>
-      <div class="bcard-foot"><span>${MONTHS[curMonth]} · ${curYear}</span><b>${esc(cardName())}</b></div>
+      <div class="bcard-top"><span class="lbl">Saldo de ${MONTHS[curMonth].toLowerCase()}</span>${badge ? `<span class="status tone-${badge[0]}">${badge[1]}</span>` : ''}</div>
+      <div class="bal-v" id="hv-saldo">${balHTML(lastVals.saldo ?? 0)}</div>
+      ${O ? `<div class="meter"><i ${w(Math.min(pct, 100), 'background:' + (pct > 100 ? 'var(--red)' : 'var(--gold-grad)'))}></i></div>
+      <div class="meter-legend"><span>${brl(G)} de ${brl(O)}</span><span>${hint}</span></div>` : ''}
+      ${O ? '' : `<div class="mini">
+        <div><span>Receitas</span><b>${brlShort(R).replace('R$', '').trim()}</b></div>
+        <div><span>Orçado</span><b>${brlShort(O).replace('R$', '').trim()}</b></div>
+        <div><span>Gasto</span><b>${brlShort(G).replace('R$', '').trim()}</b></div>
+      </div>`}
     </section>`;
 
   if (empty) {
@@ -877,7 +925,7 @@ function renderInicio() {
     page.innerHTML = card + `
       <section class="welcome">
         <h3>Vamos planejar <i>${MONTHS[curMonth].toLowerCase()}</i>?</h3>
-        <p>Cadastre suas receitas e defina quanto pretende gastar em cada categoria. Depois, é só registrar os gastos no botão central.</p>
+        <p>Cadastre suas receitas e quanto quer gastar em cada categoria.</p>
         <div class="welcome-actions">
           ${canCopy ? `<button class="copy-btn" style="margin:0" onclick="copyFromPrev()">Copiar orçamento de ${MONTHS[(curMonth + 11) % 12].toLowerCase()}</button>` : ''}
           <button class="btn-soft" onclick="openSheet('receita')">Adicionar receita</button>
@@ -885,13 +933,30 @@ function renderInicio() {
         </div>
       </section>`;
     countUp($('#hv-saldo'), saldo, 'saldo', balHTML, true);
+    growAll(page);
     return;
   }
 
-  page.innerHTML = card + `<div class="aside">${gaugeHTML(d, R, O, G)}${trioHTML(R, O, G)}${notesHTML(d, G)}</div>` + donutHTML(d, G) + evoHTML() + recentHTML(d);
+  page.innerHTML = card + homeCatsHTML(d) + recentHTML(d);
   countUp($('#hv-saldo'), saldo, 'saldo', balHTML, true);
-  countUp($('#dv-total'), G, 'donut');
   growAll(page);
+}
+function homeCatsHTML(d) {
+  if (!d.categorias.length) return '';
+  const list = d.categorias.map(c => ({ c, u: usedBy(d, c.id) })).sort((a, b) => b.u - a.u).slice(0, 3);
+  return `<section class="card home-cats">
+    <div class="card-head"><span class="card-title">Categorias</span><button class="link" onclick="switchTab('orcamento')">Ver todas</button></div>
+    ${list.map(({ c, u }) => {
+      const o = c.orcamento || 0, p = o > 0 ? u / o * 100 : (u > 0 ? 100 : 0), cor = catColor(c);
+      return `<div class="row" onclick="goToCat('${c.id}')">
+        ${mono(c.nome, cor)}
+        <div class="row-main">
+          <div class="row-line"><span class="row-name">${esc(stripEmoji(c.nome))}</span><span class="row-sub" style="margin:0">${brl0(u)}<span style="color:var(--text3)">&nbsp;de ${brl0(o)}</span></span></div>
+          <div class="bar-track"><i ${w(Math.min(p, 100), 'background:' + (p > 100 ? 'var(--red)' : cor))}></i></div>
+        </div>
+      </div>`;
+    }).join('')}
+  </section>`;
 }
 function balHTML(v) {
   const neg = v < 0, a = Math.abs(v);
@@ -1031,9 +1096,9 @@ function evoHTML() {
 
 function recentHTML(d) {
   if (!d.lancamentos.length) return '';
-  const list = [...d.lancamentos].sort((a, b) => b.data.localeCompare(a.data)).slice(0, 5);
+  const list = [...d.lancamentos].sort((a, b) => b.data.localeCompare(a.data)).slice(0, 3);
   return `<section class="card recent-card">
-    <div class="card-head"><span class="card-title">Últimos movimentos</span><button class="link" onclick="switchTab('lancamentos')">Ver extrato →</button></div>
+    <div class="card-head"><span class="card-title">Últimos gastos</span><button class="link" onclick="switchTab('lancamentos')">Ver todos</button></div>
     <div class="tx-list">
       ${list.map(l => txRow(l, d, true)).join('')}
     </div>
@@ -1167,7 +1232,7 @@ function renderOrc() {
 
   page.innerHTML = `
     ${canCopy ? `<button class="copy-btn" onclick="copyFromPrev()">Copiar orçamento de ${MONTHS[(curMonth + 11) % 12].toLowerCase()}</button>` : ''}
-    <section class="plan">${guilloche()}
+    <section class="plan">
       <div style="flex:1">
         <div class="eyebrow">Sobra planejada</div>
         <div class="plan-v" style="color:${planejada >= 0 ? 'var(--text)' : 'var(--red)'}">${brl(planejada)}</div>
@@ -1304,11 +1369,9 @@ function openSheet(type, item = {}) {
     body.innerHTML = `
       <div class="sheet-title">Ajustes</div>
       ${accountHTML()}
-      <div class="fg"><label class="fl">Nome no cartão</label>
-        <input class="fi" id="f-cardname" type="text" placeholder="${esc(cardName())}" value="${esc(meta().nome || '')}" maxlength="22"></div>
       <div class="fg"><label class="fl">Nome do app</label>
         <input class="fi" id="f-title" type="text" placeholder="Minhas Finanças" value="${esc(stripEmoji(meta().title))}"></div>
-      <button class="btn-primary" onclick="saveAppTitle()">Salvar</button>
+      <button class="btn-primary" onclick="saveAppTitle()">Salvar nome</button>
       ${isStandalone() ? '' : `<div style="height:22px"></div>
       <label class="fl">Aplicativo</label>
       <button class="btn-soft" style="width:100%" onclick="installApp()">Instalar na tela inicial</button>`}
@@ -1501,8 +1564,7 @@ function delLanc(id) {
 
 function saveAppTitle() {
   const title = $('#f-title').value.trim() || 'Minhas Finanças';
-  const nome = $('#f-cardname').value.trim();
-  loadAll()._meta = { ...(loadAll()._meta || {}), title, nome };
+  loadAll()._meta = { ...(loadAll()._meta || {}), title };
   persist(); closeSheet(); updateHeader(); ANIM = false; renderTab(); toast('Ajustes salvos');
 }
 
