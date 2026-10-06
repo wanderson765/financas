@@ -9,6 +9,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Finanças">
   <title>Minhas Finanças</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="favicon-32.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -422,6 +425,88 @@
     .shake { animation: shake .4s; border-color: var(--red) !important; }
     @keyframes shake { 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 
+    /* ── Instalação ── */
+    .install {
+      position: fixed; left: 50%; bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom)); z-index: 150;
+      width: calc(100% - 24px); max-width: 436px;
+      transform: translate(-50%, 140%); opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 12px;
+      background: rgba(24,29,38,0.92); border: 1px solid var(--border2); border-radius: 20px;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 18px 40px -12px rgba(0,0,0,0.7);
+      transition: transform .45s var(--ease), opacity .3s;
+    }
+    .install.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+    .install img { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; }
+    .install-txt { flex: 1; min-width: 0; }
+    .install-txt b { display: block; font-size: 14px; }
+    .install-txt span { font-size: 12px; color: var(--text2); }
+    .install-go {
+      background: var(--green); color: #04130c; border: none; border-radius: 12px;
+      padding: 9px 14px; font-size: 13px; font-weight: 800; cursor: pointer; flex-shrink: 0;
+    }
+    .install-x { background: none; border: none; color: var(--text3); font-size: 20px; padding: 4px 6px; cursor: pointer; line-height: 1; }
+    .steps { display: grid; gap: 10px; margin-bottom: 18px; }
+    .step {
+      display: flex; align-items: center; gap: 14px; padding: 14px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; font-size: 14px; line-height: 1.4;
+    }
+    .step-n {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+      background: var(--green-soft); color: var(--green); font-weight: 800; font-size: 13px;
+    }
+    .step svg { width: 20px; height: 20px; vertical-align: -4px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .install-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .install-hero img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 10px 24px -8px rgba(16,185,129,0.6); }
+    .install-hero p { font-size: 13px; color: var(--text2); line-height: 1.45; }
+    .ios-arrow { text-align: center; color: var(--text2); font-size: 12px; margin-top: 4px; animation: bob 1.4s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(6px); } }
+
+    /* ── Login ── */
+    .auth { position: fixed; inset: 0; z-index: 250; background: var(--bg); overflow-y: auto; display: none; }
+    .auth.show { display: block; animation: pageIn .35s var(--ease); }
+    .auth-bg { position: fixed; inset: 0; pointer-events: none;
+      background: radial-gradient(500px 320px at 15% 0%, rgba(52,211,153,0.16), transparent 60%),
+                  radial-gradient(420px 300px at 100% 30%, rgba(96,165,250,0.10), transparent 60%); }
+    .auth-inner {
+      position: relative; max-width: 400px; margin: 0 auto; min-height: 100%;
+      padding: calc(40px + env(safe-area-inset-top)) 24px calc(32px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .auth-logo { width: 72px; height: 72px; border-radius: 22px; margin-bottom: 22px; box-shadow: 0 16px 34px -10px rgba(16,185,129,0.65); }
+    .auth h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; }
+    .auth-sub { color: var(--text2); font-size: 14px; margin: 8px 0 26px; line-height: 1.5; }
+    .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 4px; margin-bottom: 18px; }
+    .seg button { border: none; background: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 14px; color: var(--text2); cursor: pointer; transition: all .2s; }
+    .seg button.sel { background: var(--surface3); color: var(--text); }
+    .pw { position: relative; }
+    .pw .fi { padding-right: 70px; }
+    .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text2); font-size: 13px; font-weight: 600; padding: 8px 10px; cursor: pointer; }
+    .auth-msg { font-size: 13px; line-height: 1.45; padding: 12px 14px; border-radius: 12px; margin-bottom: 14px; display: none; }
+    .auth-msg.err { display: block; background: var(--red-soft); color: var(--red); }
+    .auth-msg.ok { display: block; background: var(--green-soft); color: var(--green); }
+    .auth-links { display: flex; justify-content: center; margin-top: 14px; }
+    .divider { display: flex; align-items: center; gap: 12px; color: var(--text3); font-size: 12px; margin: 22px 0 14px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+    .btn-ghost { width: 100%; background: transparent; border: 1px solid var(--border2); color: var(--text); padding: 14px; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .auth-foot { font-size: 12px; color: var(--text3); text-align: center; margin-top: 12px; line-height: 1.5; }
+    .btn-primary:disabled { opacity: .6; pointer-events: none; }
+    .spin { display: inline-block; width: 16px; height: 16px; border: 2.5px solid rgba(4,19,12,.25); border-top-color: #04130c; border-radius: 50%; animation: rot .7s linear infinite; vertical-align: -3px; }
+    @keyframes rot { to { transform: rotate(360deg); } }
+
+    .title-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text3); }
+    .sync-dot.ok { background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,.6); }
+    .sync-dot.pending, .sync-dot.syncing { background: var(--yellow); animation: blink 1s infinite; }
+    .sync-dot.error { background: var(--red); }
+    .sync-dot.hidden { display: none; }
+    @keyframes blink { 50% { opacity: .3; } }
+    .account { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 10px; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: linear-gradient(145deg, #4ade80, #10b981); color: #04130c; font-weight: 800; font-size: 17px; }
+    .account-info { flex: 1; min-width: 0; }
+    .account-info b { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .account-info span { font-size: 12px; color: var(--text2); }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -430,7 +515,7 @@
 <body>
 
 <header class="header">
-  <span class="app-title" id="app-title" onclick="openSettings()">💰 Minhas Finanças</span>
+  <div class="title-wrap"><span class="app-title" id="app-title" onclick="openSettings()">💰 Minhas Finanças</span><span class="sync-dot hidden" id="sync-dot" onclick="openSettings()"></span></div>
   <div class="month-nav">
     <button onclick="shiftMonth(-1)" aria-label="Mês anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
     <button class="month-label num" id="monthLabel" onclick="goToday()"></button>
@@ -469,6 +554,15 @@
   </div>
 </div>
 
+<div class="auth" id="auth"><div class="auth-bg"></div><div class="auth-inner" id="auth-inner"></div></div>
+
+<div class="install" id="install-banner">
+  <img src="apple-touch-icon.png" alt="">
+  <div class="install-txt"><b>Instale o app</b><span>Tela cheia, acesso rápido e funciona offline</span></div>
+  <button class="install-go" onclick="installApp()">Instalar</button>
+  <button class="install-x" onclick="dismissInstall()" aria-label="Fechar">×</button>
+</div>
+
 <div class="toast" id="toast"><span id="toast-msg"></span><button id="toast-btn"></button></div>
 <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
 
@@ -504,9 +598,13 @@ function loadAll() {
   try { store = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { store = {}; }
   return store;
 }
-function persist() {
+function persistLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
   catch { toast('Não foi possível salvar neste navegador'); }
+}
+function persist() {
+  persistLocal();
+  if (typeof schedulePush === 'function') schedulePush();
 }
 const pad = n => String(n).padStart(2, '0');
 const keyOf = (y, m) => `${y}-${pad(m + 1)}`;
@@ -1063,19 +1161,59 @@ function openSheet(type, item = {}) {
     catTouched = !!item.catId;
     focus = editId ? null : 'f-valor';
 
+  } else if (type === 'instalar') {
+    const share = '<svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
+    const plus = '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+    const steps = isIOS ? [
+      `Toque no botão ${share} <b>Compartilhar</b> na barra do navegador`,
+      `Role a lista e toque em ${plus} <b>Adicionar à Tela de Início</b>`,
+      `Toque em <b>Adicionar</b>, no canto superior direito`
+    ] : [
+      `Toque no menu <b>⋮</b> do navegador, no canto superior direito`,
+      `Escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>`,
+      `Confirme em <b>Instalar</b>`
+    ];
+    body.innerHTML = `
+      <div class="sheet-title">Instalar o app</div>
+      <div class="install-hero"><img src="apple-touch-icon.png" alt="">
+        <p>Fica com ícone na tela inicial, abre em tela cheia e funciona mesmo sem internet. Leva 10 segundos.</p></div>
+      <div class="steps">${steps.map((t, i) => `<div class="step"><span class="step-n">${i + 1}</span><span>${t}</span></div>`).join('')}</div>
+      <button class="btn-primary" onclick="closeSheet()">Entendi</button>
+      ${isIOS ? '<div class="ios-arrow">O botão Compartilhar fica na barra do Safari ↓</div>' : ''}`;
+
+  } else if (type === 'merge') {
+    body.innerHTML = `
+      <div class="sheet-title">Você já tem dados na conta</div>
+      <p style="color:var(--text2);font-size:14px;line-height:1.5;margin-bottom:18px">Encontramos lançamentos salvos na sua conta <b style="color:var(--text)">e</b> neste aparelho. O que fazer com os deste aparelho?</p>
+      <button class="btn-primary" onclick="resolveMerge('merge')">Juntar tudo</button>
+      <button class="btn-ghost" style="margin-top:10px" onclick="resolveMerge('remote')">Usar só os da conta</button>
+      <div class="settings-note">"Juntar" mantém tudo dos dois lados, sem duplicar.<br>"Usar só os da conta" descarta o que está apenas neste aparelho.</div>`;
+
+  } else if (type === 'nova-senha') {
+    body.innerHTML = `
+      <div class="sheet-title">Criar nova senha</div>
+      <div class="fg"><label class="fl">Nova senha</label>
+        <input class="fi" id="f-pass" type="password" placeholder="Mínimo de 6 caracteres" autocomplete="new-password"></div>
+      <button class="btn-primary" onclick="saveNewPassword(this)">Salvar nova senha</button>`;
+    focus = 'f-pass';
+
   } else if (type === 'ajustes') {
     body.innerHTML = `
       <div class="sheet-title">Ajustes</div>
+      ${accountHTML()}
       <div class="fg"><label class="fl">Nome do app</label>
         <input class="fi" id="f-title" type="text" placeholder="💰 Minhas Finanças" value="${esc(meta().title)}"></div>
       <button class="btn-primary" onclick="saveAppTitle()">Salvar nome</button>
+      ${isStandalone() ? '' : `<div style="height:22px"></div>
+      <label class="fl">Aplicativo</label>
+      <button class="btn-soft" style="width:100%" onclick="installApp()">📲 Instalar na tela inicial</button>`}
       <div style="height:22px"></div>
       <label class="fl">Backup dos dados</label>
       <div class="btn-row">
         <button class="btn-soft" onclick="exportBackup()">⬇️ Exportar</button>
         <button class="btn-soft" onclick="$('#import-file').click()">⬆️ Importar</button>
       </div>
-      <div class="settings-note">Seus dados ficam salvos apenas neste navegador.<br>Exporte um backup de vez em quando para não perder nada — e use o Importar para levar tudo para outro aparelho.</div>`;
+      <div class="settings-note">${appMode() === 'cloud' ? 'Seus dados estão salvos na nuvem e sincronizados.<br>O backup é só uma cópia extra, por garantia.' : 'Seus dados ficam salvos apenas neste navegador.<br>Exporte um backup de vez em quando para não perder nada — e use o Importar para levar tudo para outro aparelho.'}</div>`;
   }
 
   document.body.style.overflow = 'hidden';
@@ -1272,9 +1410,391 @@ function importBackup(input) {
 }
 
 // ═════════════════════════════════════════════
+// NUVEM (Supabase): login + sincronização
+// ═════════════════════════════════════════════
+const SUPABASE_URL = 'https://sjcavnmnzkwgqnntahzh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sLFxH2gsS7W8ySPBsHzH9Q_dx6q0uwM'; // chave pública (pode ficar no código)
+const SUPABASE_LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+const TABLE = 'finance_months';
+const APP_URL = location.origin + location.pathname;
+
+const LS = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+let sb = null, user = null, syncState = 'idle', pushTimer = null, syncing = false, lastPull = 0, lastSyncAt = 0;
+let synced = {};          // última versão confirmada na nuvem (JSON por mês)
+let pendingRemote = null; // usado na escolha "juntar / usar da conta"
+let authTab = 'login';
+
+const appMode = () => LS.get('fin_mode');            // 'cloud' | 'local' | null
+function loadSynced() { try { synced = JSON.parse(LS.get('fin_synced') || '{}'); } catch { synced = {}; } }
+function saveSynced() { LS.set('fin_synced', JSON.stringify(synced)); }
+const isSyncKey = k => k === '_meta' || /^\d{4}-\d{2}$/.test(k);
+function dirtyKeys() {
+  const s = loadAll();
+  const keys = new Set([...Object.keys(s).filter(isSyncKey), ...Object.keys(synced)]);
+  return [...keys].filter(k => JSON.stringify(s[k] ?? null) !== (synced[k] ?? 'null'));
+}
+function monthHasData(m) { return m && ((m.receitas || []).length || (m.categorias || []).length || (m.lancamentos || []).length); }
+
+function setSync(st) {
+  syncState = st;
+  const dot = $('#sync-dot');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + (appMode() === 'cloud' ? st : 'hidden');
+  dot.title = syncLabel();
+  const lbl = document.getElementById('sync-label');
+  if (lbl) lbl.textContent = syncLabel();
+}
+function syncLabel() {
+  return { ok: 'Sincronizado ✓', pending: 'Alterações aguardando envio', syncing: 'Sincronizando…', offline: 'Sem internet — salvo no aparelho', error: 'Erro ao sincronizar, tentando de novo', idle: 'Conectando…' }[syncState] || '';
+}
+
+// ---- envio (push) ----
+function schedulePush() {
+  if (appMode() !== 'cloud') return;
+  setSync(dirtyKeys().length ? 'pending' : 'ok');
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushNow, 1200);
+}
+async function pushNow() {
+  if (!sb || !user || appMode() !== 'cloud') return;
+  if (syncing) { clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 1500); return; }
+  const keys = dirtyKeys();
+  if (!keys.length) { setSync('ok'); return; }
+  if (!navigator.onLine) { setSync('offline'); return; }
+  syncing = true; setSync('syncing');
+  const s = loadAll(), snap = {};
+  keys.forEach(k => { snap[k] = s[k] === undefined ? undefined : JSON.stringify(s[k]); });
+  try {
+    const now = new Date().toISOString();
+    const up = keys.filter(k => snap[k] !== undefined).map(k => ({ user_id: user.id, month: k, data: JSON.parse(snap[k]), updated_at: now }));
+    const del = keys.filter(k => snap[k] === undefined);
+    if (up.length) { const { error } = await sb.from(TABLE).upsert(up); if (error) throw error; }
+    if (del.length) { const { error } = await sb.from(TABLE).delete().in('month', del); if (error) throw error; }
+    keys.forEach(k => { if (snap[k] === undefined) delete synced[k]; else synced[k] = snap[k]; });
+    saveSynced(); lastSyncAt = Date.now();
+    syncing = false;
+    if (dirtyKeys().length) schedulePush(); else setSync('ok');
+  } catch (e) {
+    console.warn('sync push', e);
+    syncing = false;
+    setSync(navigator.onLine ? 'error' : 'offline');
+    clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 15000);
+  }
+}
+
+// ---- recebimento (pull) ----
+async function fetchRemote() {
+  const { data, error } = await sb.from(TABLE).select('month,data');
+  if (error) throw error;
+  const remote = {};
+  (data || []).forEach(r => { remote[r.month] = r.data; });
+  return remote;
+}
+async function pull() {
+  if (!sb || !user || appMode() !== 'cloud') return;
+  if (!navigator.onLine) { setSync('offline'); return; }
+  try {
+    setSync('syncing');
+    const remote = await fetchRemote();
+    const s = loadAll(); let changed = false;
+    for (const [k, v] of Object.entries(remote)) {
+      const lj = JSON.stringify(s[k] ?? null), rj = JSON.stringify(v);
+      const localDirty = lj !== (synced[k] ?? 'null');
+      if (!localDirty) { if (lj !== rj) { s[k] = v; changed = true; } synced[k] = rj; }
+      else if (lj === rj) synced[k] = rj;
+    }
+    for (const k of Object.keys(synced)) {
+      if (k in remote) continue;
+      const localDirty = JSON.stringify(s[k] ?? null) !== synced[k];
+      if (!localDirty && s[k] !== undefined) { delete s[k]; changed = true; }
+      delete synced[k];
+    }
+    saveSynced(); lastPull = Date.now();
+    if (changed) { persistLocal(); ANIM = false; refresh(); }
+    if (dirtyKeys().length) schedulePush(); else setSync('ok');
+  } catch (e) {
+    console.warn('sync pull', e);
+    setSync(navigator.onLine ? 'error' : 'offline');
+  }
+}
+
+// ---- primeira vez desta conta neste aparelho ----
+async function firstSync() {
+  synced = {}; saveSynced();
+  let remote;
+  try { setSync('syncing'); remote = await fetchRemote(); }
+  catch (e) { console.warn(e); setSync('error'); toast('Não consegui falar com o servidor. Tento de novo depois.'); return; }
+  const local = loadAll();
+  const hasLocal = Object.keys(local).some(k => /^\d{4}-\d{2}$/.test(k) && monthHasData(local[k]));
+  const hasRemote = Object.keys(remote).length > 0;
+  LS.set('fin_owner', user.id);
+  if (!hasRemote) {
+    persist(); // envia tudo o que já existe no aparelho
+    if (hasLocal) toast('Seus dados foram enviados para a nuvem ☁️');
+  } else if (!hasLocal) {
+    store = remote; Object.keys(remote).forEach(k => synced[k] = JSON.stringify(remote[k]));
+    saveSynced(); persistLocal(); ANIM = true; refresh(); setSync('ok');
+    toast('Dados da conta carregados ✓');
+  } else {
+    pendingRemote = remote;
+    openSheet('merge');
+  }
+}
+function mergeMonth(a = {}, b = {}) {
+  const out = {};
+  ['receitas', 'categorias', 'lancamentos'].forEach(f => {
+    const map = new Map();
+    (b[f] || []).forEach(x => map.set(x.id, x));
+    (a[f] || []).forEach(x => map.set(x.id, x)); // aparelho vence em caso de mesmo id
+    out[f] = [...map.values()];
+  });
+  return out;
+}
+function resolveMerge(choice) {
+  const remote = pendingRemote || {}; pendingRemote = null;
+  const local = loadAll();
+  Object.keys(remote).forEach(k => synced[k] = JSON.stringify(remote[k]));
+  if (choice === 'remote') store = JSON.parse(JSON.stringify(remote));
+  else {
+    const out = { ...remote };
+    Object.keys(local).filter(isSyncKey).forEach(k => {
+      out[k] = k === '_meta' ? { ...(remote._meta || {}), ...local._meta } : (remote[k] ? mergeMonth(local[k], remote[k]) : local[k]);
+    });
+    store = out;
+  }
+  saveSynced(); closeSheet(); persist(); ANIM = true; refresh();
+  toast(choice === 'remote' ? 'Dados da conta carregados ✓' : 'Tudo junto e sincronizado ✓');
+}
+
+// ---- login ----
+function showAuth(note) {
+  closeSheet(); hideBanner();
+  renderAuth(note);
+  $('#auth').classList.add('show');
+}
+function hideAuth() { $('#auth').classList.remove('show'); }
+function renderAuth(note) {
+  const login = authTab === 'login';
+  $('#auth-inner').innerHTML = `
+    <img class="auth-logo" src="apple-touch-icon.png" alt="">
+    <h1>${login ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
+    <p class="auth-sub">${login ? 'Entre para ver suas finanças em qualquer aparelho.' : 'Seus dados ficam salvos na nuvem e sincronizados entre celular e computador.'}</p>
+    <div class="seg">
+      <button class="${login ? 'sel' : ''}" onclick="authTab='login';renderAuth()">Entrar</button>
+      <button class="${login ? '' : 'sel'}" onclick="authTab='signup';renderAuth()">Criar conta</button>
+    </div>
+    <div class="auth-msg ${note ? 'err' : ''}" id="auth-msg">${note ? esc(note) : ''}</div>
+    <div class="fg"><label class="fl">E-mail</label>
+      <input class="fi" id="a-email" type="email" inputmode="email" autocomplete="email" placeholder="voce@email.com" value="${esc(LS.get('fin_email') || '')}"></div>
+    <div class="fg"><label class="fl">Senha</label>
+      <div class="pw"><input class="fi" id="a-pass" type="password" autocomplete="${login ? 'current-password' : 'new-password'}" placeholder="${login ? 'Sua senha' : 'Mínimo de 6 caracteres'}">
+      <button type="button" onclick="const i=$('#a-pass');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'Mostrar':'Ocultar'">Mostrar</button></div></div>
+    <button class="btn-primary" id="a-btn" onclick="submitAuth()">${login ? 'Entrar' : 'Criar conta'}</button>
+    ${login ? `<div class="auth-links"><button class="link" onclick="forgotPassword()">Esqueci minha senha</button></div>` : ''}
+    <div class="divider">ou</div>
+    <button class="btn-ghost" onclick="useLocal()">Usar sem conta</button>
+    <div class="auth-foot">Sem conta, os dados ficam só neste aparelho.<br>Você pode criar uma conta depois em Ajustes.</div>`;
+  $('#auth-inner').querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(); }));
+}
+function authMsg(text, kind) { const m = $('#auth-msg'); if (!m) return; m.className = 'auth-msg ' + kind; m.textContent = text; }
+function trError(e) {
+  const m = (e && (e.message || e.error_description || '')) + '';
+  if (/invalid login/i.test(m)) return 'E-mail ou senha incorretos.';
+  if (/already registered|already been registered/i.test(m)) return 'Este e-mail já tem conta. Use "Entrar".';
+  if (/not confirmed/i.test(m)) return 'Confirme seu e-mail antes de entrar — veja sua caixa de entrada (e o spam).';
+  if (/password.*(6|characters|short)/i.test(m)) return 'A senha precisa ter pelo menos 6 caracteres.';
+  if (/rate limit|too many|security purposes/i.test(m)) return 'Muitas tentativas. Aguarde um minuto e tente de novo.';
+  if (/invalid.*email|email.*invalid/i.test(m)) return 'E-mail inválido.';
+  if (/fetch|network/i.test(m)) return 'Sem conexão. Verifique sua internet.';
+  return m || 'Algo deu errado. Tente novamente.';
+}
+async function submitAuth() {
+  const email = $('#a-email').value.trim(), password = $('#a-pass').value;
+  if (!/^\S+@\S+\.\S+$/.test(email)) return authMsg('Digite um e-mail válido.', 'err');
+  if (password.length < 6) return authMsg('A senha precisa ter pelo menos 6 caracteres.', 'err');
+  if (!sb) return authMsg('Sem conexão com o servidor. Verifique sua internet e recarregue.', 'err');
+  const btn = $('#a-btn'), label = btn.textContent;
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  LS.set('fin_email', email);
+  try {
+    if (authTab === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: APP_URL } });
+      if (error) throw error;
+      if (!data.session) {
+        authTab = 'login'; renderAuth();
+        authMsg(`Conta criada! Enviamos um link de confirmação para ${email}. Abra o e-mail, toque no link e depois entre aqui.`, 'ok');
+        return;
+      }
+    }
+  } catch (e) { authMsg(trError(e), 'err'); }
+  finally { const b = $('#a-btn'); if (b) { b.disabled = false; b.textContent = label; } }
+}
+async function forgotPassword() {
+  const email = $('#a-email').value.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) return authMsg('Digite seu e-mail acima e toque de novo em "Esqueci minha senha".', 'err');
+  if (!sb) return authMsg('Sem conexão com o servidor.', 'err');
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: APP_URL });
+  if (error) authMsg(trError(error), 'err');
+  else authMsg(`Enviamos um link para ${email}. Abra o e-mail para criar uma nova senha.`, 'ok');
+}
+async function saveNewPassword(btn) {
+  const password = $('#f-pass').value;
+  if (password.length < 6) return invalid('f-pass', 'Mínimo de 6 caracteres');
+  btn.disabled = true;
+  const { error } = await sb.auth.updateUser({ password });
+  btn.disabled = false;
+  if (error) return toast(trError(error));
+  closeSheet(); toast('Senha alterada ✓');
+}
+function useLocal() {
+  LS.set('fin_mode', 'local'); hideAuth(); setSync('idle');
+  toast('Modo sem conta: dados só neste aparelho');
+  if (isMobile) maybeShowBanner();
+}
+async function logout() {
+  if (dirtyKeys().length) {
+    await pushNow();
+    if (dirtyKeys().length && !confirm('Algumas alterações ainda não foram enviadas (sem internet). Se sair agora, elas serão perdidas. Sair mesmo assim?')) return;
+  }
+  closeSheet();
+  try { await sb.auth.signOut(); } catch {}
+  signedOutCleanup();
+}
+function signedOutCleanup() {
+  user = null; store = {}; persistLocal(); synced = {}; saveSynced();
+  LS.del('fin_owner'); LS.del('fin_mode');
+  Object.keys(lastVals).forEach(k => delete lastVals[k]);
+  ANIM = true; refresh(); setSync('idle');
+  showAuth();
+}
+function accountHTML() {
+  if (appMode() === 'cloud' && user) {
+    return `<div class="account">
+        <div class="avatar">${esc((user.email || '?')[0].toUpperCase())}</div>
+        <div class="account-info"><b>${esc(user.email)}</b><span id="sync-label">${syncLabel()}</span></div>
+      </div>
+      <div class="btn-row" style="margin-bottom:22px">
+        <button class="btn-soft" onclick="syncNow()">🔄 Sincronizar</button>
+        <button class="btn-soft" onclick="logout()">Sair da conta</button>
+      </div>`;
+  }
+  if (appMode() === 'cloud') {
+    return `<div class="account"><div class="avatar">☁️</div><div class="account-info"><b>${esc(LS.get('fin_email') || 'Sua conta')}</b><span>Conectando… (sem internet?)</span></div></div><div style="height:12px"></div>`;
+  }
+  return `<div class="account"><div class="avatar">📱</div><div class="account-info"><b>Sem conta</b><span>Dados salvos só neste aparelho</span></div></div>
+    <button class="btn-primary" style="margin:0 0 22px" onclick="showAuth()">☁️ Entrar ou criar conta</button>`;
+}
+async function syncNow() { await pushNow(); await pull(); toast(syncState === 'ok' ? 'Tudo sincronizado ✓' : syncLabel()); }
+
+// ---- ciclo de vida ----
+async function handleAuth(event, session) {
+  if (event === 'PASSWORD_RECOVERY') {
+    user = session?.user || user;
+    LS.set('fin_mode', 'cloud'); hideAuth();
+    openSheet('nova-senha');
+    return;
+  }
+  if (session?.user) {
+    const isNew = !user || user.id !== session.user.id;
+    user = session.user;
+    if (!isNew) return;
+    LS.set('fin_mode', 'cloud'); LS.set('fin_email', user.email || '');
+    hideAuth(); setSync('syncing');
+    if (isMobile) maybeShowBanner();
+    if (LS.get('fin_owner') && LS.get('fin_owner') !== user.id) { store = {}; persistLocal(); synced = {}; saveSynced(); }
+    if (LS.get('fin_owner') !== user.id) await firstSync();
+    else { await pushNow(); await pull(); }
+    return;
+  }
+  if (event === 'SIGNED_OUT' && user) { signedOutCleanup(); return; }
+  if (event === 'INITIAL_SESSION') {
+    if (appMode() === 'cloud') {
+      if (!navigator.onLine) { setSync('offline'); return; } // sem internet: segue com os dados do aparelho
+      user = null; LS.set('fin_mode', '');
+      showAuth('Sua sessão expirou. Entre novamente — seus dados estão salvos na nuvem.');
+    } else if (appMode() !== 'local') showAuth();
+  }
+}
+function initCloud() {
+  if (!window.supabase || !window.supabase.createClient) {
+    setSync('offline');
+    if (!appMode()) showAuth('Sem conexão com o servidor agora. Você pode usar sem conta e entrar depois.');
+    return;
+  }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+  sb.auth.onAuthStateChange((event, session) => { setTimeout(() => handleAuth(event, session), 0); });
+}
+function loadCloudLib() {
+  const sc = document.createElement('script');
+  sc.src = SUPABASE_LIB; sc.async = true;
+  sc.onload = initCloud; sc.onerror = initCloud;
+  document.head.appendChild(sc);
+}
+window.addEventListener('online', () => { if (appMode() === 'cloud') { pushNow().then(pull); } });
+window.addEventListener('offline', () => { if (appMode() === 'cloud') setSync('offline'); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && appMode() === 'cloud' && Date.now() - lastPull > 20000) pull();
+});
+
+// ═════════════════════════════════════════════
+// INSTALAÇÃO (PWA)
+// ═════════════════════════════════════════════
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isMobile = isIOS || /android/i.test(navigator.userAgent);
+function isStandalone() { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+let installPrompt = null, bannerTimer = null;
+
+function installDismissed() {
+  try { return Date.now() - (+localStorage.getItem('fin_install_dismiss') || 0) < 21 * 864e5; } catch { return false; }
+}
+function maybeShowBanner() {
+  if (isStandalone() || installDismissed()) return;
+  if (!installPrompt && !isMobile) return;
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => $('#install-banner').classList.add('show'), 2500);
+}
+function hideBanner() { clearTimeout(bannerTimer); $('#install-banner').classList.remove('show'); }
+function dismissInstall() {
+  try { localStorage.setItem('fin_install_dismiss', String(Date.now())); } catch {}
+  hideBanner();
+}
+async function installApp() {
+  hideBanner();
+  if (installPrompt) {
+    closeSheet();
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    installPrompt = null;
+    if (outcome !== 'accepted') dismissInstall();
+  } else {
+    openSheet('instalar');
+  }
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; maybeShowBanner(); });
+window.addEventListener('appinstalled', () => { hideBanner(); toast('App instalado ✓'); });
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+// ═════════════════════════════════════════════
 // INÍCIO
 // ═════════════════════════════════════════════
+loadSynced();
 refresh();
+setSync(appMode() === 'cloud' ? (navigator.onLine ? 'idle' : 'offline') : 'idle');
+if (!appMode()) showAuth();
+else if (isMobile && appMode() === 'local') maybeShowBanner();
+loadCloudLib();
 </script>
 </body>
 </html>
