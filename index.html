@@ -564,7 +564,6 @@
 </div>
 
 <div class="toast" id="toast"><span id="toast-msg"></span><button id="toast-btn"></button></div>
-<input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
 
 <script>
 // ═════════════════════════════════════════════
@@ -1208,14 +1207,15 @@ function openSheet(type, item = {}) {
       <label class="fl">Aplicativo</label>
       <button class="btn-soft" style="width:100%" onclick="installApp()">📲 Instalar na tela inicial</button>`}
       <div style="height:22px"></div>
-      <label class="fl">Backup dos dados</label>
+      <label class="fl">Baixar planilha (Excel)</label>
       <div class="btn-row">
-        <button class="btn-soft" onclick="exportBackup()">⬇️ Exportar</button>
-        <button class="btn-soft" onclick="$('#import-file').click()">⬆️ Importar</button>
+        <button class="btn-soft" onclick="exportExcel('mes', this)">📊 ${MONTHS[curMonth].slice(0, 3)} ${curYear}</button>
+        <button class="btn-soft" onclick="exportExcel('tudo', this)">📚 Todos os meses</button>
       </div>
-      <div class="settings-note">${appMode() === 'cloud' ? 'Seus dados estão salvos na nuvem e sincronizados.<br>O backup é só uma cópia extra, por garantia.' : 'Seus dados ficam salvos apenas neste navegador.<br>Exporte um backup de vez em quando para não perder nada — e use o Importar para levar tudo para outro aparelho.'}</div>`;
+      <div class="settings-note">${appMode() === 'cloud' ? '🔒 Seus dados estão protegidos na nuvem e só você tem acesso.' : 'Sem conta, os dados ficam só neste aparelho. Crie uma conta para não perdê-los.'}</div>`;
   }
 
+  if (type === 'ajustes') loadXLSX().catch(() => {}); // pré-carrega para baixar na hora
   document.body.style.overflow = 'hidden';
   $('#overlay').classList.add('open');
   $('#sheet').scrollTop = 0;
@@ -1380,33 +1380,102 @@ function saveAppTitle() {
 }
 
 // ═════════════════════════════════════════════
-// BACKUP
+// PLANILHA (Excel)
 // ═════════════════════════════════════════════
-function exportBackup() {
-  const blob = new Blob([JSON.stringify(loadAll(), null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `financas-backup-${today()}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast('Backup exportado ✓');
+const XLSX_LIB = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+let xlsxPromise = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxPromise) xlsxPromise = new Promise((ok, fail) => {
+    const sc = document.createElement('script');
+    sc.src = XLSX_LIB; sc.async = true;
+    sc.onload = () => ok(window.XLSX);
+    sc.onerror = () => { xlsxPromise = null; sc.remove(); fail(new Error('xlsx')); };
+    document.head.appendChild(sc);
+  });
+  return xlsxPromise;
 }
-function importBackup(input) {
-  const file = input.files[0]; input.value = '';
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const ok = data && typeof data === 'object' && Object.keys(data).every(k => k === '_meta' || /^\d{4}-\d{2}$/.test(k));
-      if (!ok) throw new Error();
-      if (!confirm('Importar este backup? Os dados atuais deste aparelho serão substituídos.')) return;
-      const snap = JSON.stringify(loadAll());
-      store = data; persist(); closeSheet(); ANIM = true; refresh();
-      toast('Backup importado ✓', { label: 'Desfazer', fn: () => { store = JSON.parse(snap); persist(); refresh(); } });
-    } catch { toast('Arquivo de backup inválido'); }
-  };
-  reader.readAsText(file);
+function toDate(iso) { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); }
+function monthName(k) { const [y, m] = k.split('-').map(Number); return `${MONTHS[m - 1]}/${y}`; }
+
+function buildSheet(XLSX, header, rows, cols) {
+  // cols: [{w: largura, fmt: 'money'|'date'|'pct'|null}]
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows], { cellDates: true });
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let r = 1; r <= range.e.r; r++) {
+    cols.forEach((c, ci) => {
+      const cell = ws[XLSX.utils.encode_cell({ r, c: ci })];
+      if (!cell) return;
+      if (c.fmt === 'money') cell.z = '"R$" #,##0.00;[Red]-"R$" #,##0.00';
+      if (c.fmt === 'date') cell.z = 'dd/mm/yyyy';
+      if (c.fmt === 'pct') cell.z = '0%';
+    });
+  }
+  ws['!cols'] = cols.map(c => ({ wch: c.w }));
+  ws['!autofilter'] = { ref: ws['!ref'] };
+  return ws;
+}
+
+async function exportExcel(scope, btn) {
+  const keys = scope === 'mes' ? [mk()] : Object.keys(loadAll()).filter(k => /^\d{4}-\d{2}$/.test(k) && monthHasData(loadAll()[k])).sort();
+  if (!keys.length || !keys.some(k => monthHasData(peekMonth(k)))) return toast('Nada para exportar ainda');
+  const old = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Gerando…'; }
+  try {
+    const XLSX = await loadXLSX();
+    const lanc = [], resumo = [], rec = [], meses = [];
+    keys.forEach(k => {
+      const d = peekMonth(k), mn = monthName(k);
+      const G = sum(d.lancamentos, 'valor'), R = sum(d.receitas, 'valor'), O = sum(d.categorias, 'orcamento');
+      [...d.lancamentos].sort((a, b) => a.data.localeCompare(b.data)).forEach(l => {
+        const c = catOf(d, l);
+        lanc.push([toDate(l.data), l.desc || '', c ? c.nome : 'Sem categoria', Number(l.valor) || 0, mn]);
+      });
+      d.categorias.forEach(c => {
+        const u = usedBy(d, c.id), o = Number(c.orcamento) || 0;
+        resumo.push([mn, c.nome, o, u, o - u, o > 0 ? u / o : null]);
+      });
+      const orphan = d.lancamentos.filter(l => !catOf(d, l)).reduce((s, l) => s + (l.valor || 0), 0);
+      if (orphan) resumo.push([mn, 'Sem categoria', 0, orphan, -orphan, null]);
+      d.receitas.forEach(r => rec.push([mn, r.nome, Number(r.valor) || 0]));
+      meses.push([mn, R, O, G, R - G, R - O]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    if (scope === 'tudo') XLSX.utils.book_append_sheet(wb, buildSheet(XLSX,
+      ['Mês', 'Receitas', 'Orçado', 'Gasto', 'Saldo (receitas − gasto)', 'Sobra planejada'], meses,
+      [{ w: 16 }, { w: 14, fmt: 'money' }, { w: 14, fmt: 'money' }, { w: 14, fmt: 'money' }, { w: 22, fmt: 'money' }, { w: 16, fmt: 'money' }]), 'Meses');
+    XLSX.utils.book_append_sheet(wb, buildSheet(XLSX,
+      ['Data', 'Descrição', 'Categoria', 'Valor', 'Mês'], lanc,
+      [{ w: 12, fmt: 'date' }, { w: 30 }, { w: 18 }, { w: 14, fmt: 'money' }, { w: 16 }]), 'Lançamentos');
+    XLSX.utils.book_append_sheet(wb, buildSheet(XLSX,
+      ['Mês', 'Categoria', 'Orçado', 'Gasto', 'Saldo', '% usado'], resumo,
+      [{ w: 16 }, { w: 20 }, { w: 14, fmt: 'money' }, { w: 14, fmt: 'money' }, { w: 14, fmt: 'money' }, { w: 10, fmt: 'pct' }]), 'Categorias');
+    XLSX.utils.book_append_sheet(wb, buildSheet(XLSX,
+      ['Mês', 'Receita', 'Valor'], rec,
+      [{ w: 16 }, { w: 24 }, { w: 14, fmt: 'money' }]), 'Receitas');
+
+    const name = scope === 'mes' ? `financas-${mk()}.xlsx` : `financas-completo-${today()}.xlsx`;
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array', cellDates: true });
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const file = new File([blob], name, { type: blob.type });
+
+    // No celular: abre o menu de compartilhar (salvar em Arquivos, WhatsApp, e-mail…)
+    if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); toast('Planilha pronta ✓'); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Planilha baixada ✓');
+  } catch (e) {
+    console.warn(e);
+    toast('Não consegui gerar a planilha. Verifique a internet e tente de novo.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = old; }
+  }
 }
 
 // ═════════════════════════════════════════════
