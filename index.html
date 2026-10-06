@@ -507,6 +507,124 @@
     .account-info b { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .account-info span { font-size: 12px; color: var(--text2); }
 
+    /* ── Elementos só do computador ── */
+    .page-title, .side-brand, .side-foot, .side-keys, .fab-label, .auth-side { display: none; }
+
+    /* ══════════ LAYOUT COMPUTADOR ══════════ */
+    @media (min-width: 1000px) {
+      :root { --side-w: 252px; }
+      body { max-width: none; }
+      body::before {
+        background:
+          radial-gradient(900px 520px at 25% -10%, rgba(52,211,153,0.08), transparent 60%),
+          radial-gradient(800px 520px at 100% 0%, rgba(96,165,250,0.06), transparent 60%);
+      }
+      .header { margin-left: var(--side-w); height: 76px; padding: 0 36px; }
+      .header .title-wrap { display: none; }
+      .page-title { display: block; font-size: 24px; font-weight: 800; letter-spacing: -0.6px; }
+      .month-label { min-width: 110px; }
+      .content { margin-left: var(--side-w); padding: 28px 36px 56px; max-width: 1280px; }
+
+      /* menu lateral */
+      .tabs {
+        left: 0; top: 0; bottom: 0; transform: none; width: var(--side-w); max-width: none; height: auto;
+        padding: 22px 14px 18px; display: flex; flex-direction: column; align-items: stretch; gap: 4px;
+        border-top: none; border-right: 1px solid var(--border); background: rgba(13,17,23,0.7);
+      }
+      .side-brand { display: flex; align-items: center; gap: 11px; padding: 2px 8px 24px; font-weight: 800; font-size: 16px; letter-spacing: -0.3px; cursor: pointer; }
+      .side-brand img { width: 36px; height: 36px; border-radius: 11px; box-shadow: 0 8px 18px -8px rgba(16,185,129,0.7); }
+      .side-brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .fab {
+        order: 1; width: auto; height: 48px; border-radius: 14px; margin: 0 0 20px; justify-self: auto;
+        display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 800;
+      }
+      .fab:hover { filter: brightness(1.07); }
+      .fab svg { width: 20px; height: 20px; }
+      .fab-label { display: inline; }
+      .tab {
+        order: 2; flex-direction: row; justify-content: flex-start; gap: 12px; height: 46px; padding: 0 14px;
+        border-radius: 12px; font-size: 14px; font-weight: 600; color: var(--text2); flex: none;
+      }
+      .tab:hover { background: var(--surface); color: var(--text); }
+      .tab.active { background: var(--surface2); color: var(--text); }
+      .tab.active::after { top: 11px; bottom: 11px; left: 0; width: 3px; height: auto; border-radius: 0 3px 3px 0; }
+      .tab svg { width: 20px; height: 20px; }
+      .tab.active svg { transform: none; }
+      .side-foot {
+        order: 3; margin-top: auto; display: flex; align-items: center; gap: 10px; cursor: pointer;
+        padding: 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border);
+      }
+      .side-foot:hover { border-color: var(--border2); }
+      .side-foot .avatar { width: 34px; height: 34px; font-size: 14px; }
+      .side-foot .account-info b { font-size: 13px; }
+      .side-foot .account-info span { font-size: 11px; display: flex; align-items: center; gap: 6px; }
+      .side-keys { display: block; order: 4; font-size: 11px; color: var(--text3); text-align: center; padding-top: 12px; }
+      .side-keys b { color: var(--text2); font-weight: 700; border: 1px solid var(--border2); border-radius: 5px; padding: 0 5px; }
+
+      /* Início: painel em grade */
+      #page-inicio.active { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; align-items: stretch; grid-auto-flow: row dense; }
+      #page-inicio > * { margin: 0 !important; grid-column: span 12; }
+      #page-inicio > .hero { grid-column: span 7; padding: 28px; }
+      #page-inicio > .insights { grid-column: span 5; grid-auto-rows: 1fr; }
+      #page-inicio > .welcome { grid-column: span 5; }
+      #page-inicio > .donut-card { grid-column: span 5; }
+      #page-inicio > .evo { grid-column: span 7; }
+      .hero-value { font-size: 50px; letter-spacing: -2px; }
+      .hstat { padding: 13px 14px; }
+      .hstat-v { font-size: 16px; }
+      .insight { padding: 16px; display: flex; flex-direction: column; justify-content: flex-end; }
+      .insight-v { font-size: 20px; }
+      .card { padding: 22px; }
+      .card-title { font-size: 16px; }
+      .donut { width: 184px; height: 184px; }
+      .donut-center b { font-size: 17px; }
+      .donut-wrap { gap: 28px; }
+      .evo svg { max-height: 300px; }
+      .evo text { font-size: 6px; }
+      .recent-card .tx-list { margin: 0 -22px -22px !important; }
+
+      /* Lançamentos */
+      #page-lancamentos { max-width: 900px; }
+
+      /* Orçamento: duas colunas */
+      #page-orcamento.active { display: grid; grid-template-columns: 5fr 7fr; gap: 20px; align-items: start; }
+      #page-orcamento > * { margin: 0; }
+      #page-orcamento > .plan, #page-orcamento > .copy-btn { grid-column: 1 / -1; }
+      .plan { padding: 24px; }
+      .plan-v { font-size: 32px; }
+
+      /* interações de mouse */
+      .row:hover, .tx:hover, .leg:hover { background: var(--surface2); }
+      .chip:hover:not(.sel), .btn-soft:hover, .btn-add:hover { border-color: var(--border2); color: var(--text); }
+      .hit:hover { fill: rgba(255,255,255,0.03); }
+
+      /* janelas no centro em vez de painel de baixo */
+      .overlay { align-items: center; }
+      .sheet {
+        max-width: 520px; border-radius: 24px; border-bottom: 1px solid var(--border2);
+        padding: 6px 30px 30px; max-height: 88vh;
+        transform: translateY(20px) scale(.97); opacity: 0; transition: transform .3s var(--ease), opacity .2s;
+      }
+      .overlay.open .sheet { transform: none; opacity: 1; }
+      .sheet-grab { display: none; }
+      .sheet-title { margin-top: 22px; }
+
+      .toast { left: calc(50% + var(--side-w) / 2); bottom: 28px; }
+      .install { left: calc(50% + var(--side-w) / 2); bottom: 24px; }
+
+      /* login em duas colunas */
+      .auth-inner { max-width: 1080px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: center; padding: 48px 40px; }
+      .auth-side { display: block; }
+      .auth-side h2 { font-size: 46px; font-weight: 800; letter-spacing: -1.8px; line-height: 1.05; margin: 22px 0 16px; }
+      .auth-side h2 em { font-style: normal; background: linear-gradient(120deg, #4ade80, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .auth-side p { color: var(--text2); font-size: 16px; line-height: 1.55; max-width: 460px; }
+      .auth-feats { display: grid; gap: 12px; margin-top: 28px; }
+      .auth-feat { display: flex; align-items: center; gap: 14px; font-size: 15px; font-weight: 600; }
+      .auth-feat span { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border); font-size: 18px; }
+      .auth-form { background: rgba(17,21,28,0.85); border: 1px solid var(--border2); border-radius: 28px; padding: 36px; box-shadow: 0 30px 60px -30px rgba(0,0,0,0.8); }
+      .auth-form .auth-logo { display: none; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -516,6 +634,7 @@
 
 <header class="header">
   <div class="title-wrap"><span class="app-title" id="app-title" onclick="openSettings()">💰 Minhas Finanças</span><span class="sync-dot hidden" id="sync-dot" onclick="openSettings()"></span></div>
+  <h2 class="page-title" id="page-title">Visão geral</h2>
   <div class="month-nav">
     <button onclick="shiftMonth(-1)" aria-label="Mês anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
     <button class="month-label num" id="monthLabel" onclick="goToday()"></button>
@@ -530,14 +649,15 @@
 </main>
 
 <nav class="tabs">
+  <div class="side-brand" onclick="openSettings()"><img src="apple-touch-icon.png" alt=""><span id="side-title">Minhas Finanças</span></div>
   <button class="tab active" id="tab-inicio" onclick="switchTab('inicio')">
     <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>Início
   </button>
   <button class="tab" id="tab-lancamentos" onclick="switchTab('lancamentos')">
     <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Lançamentos
   </button>
-  <button class="fab" onclick="openSheet('lancamento')" aria-label="Novo gasto">
-    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+  <button class="fab" onclick="openSheet('lancamento')" aria-label="Novo gasto" title="Novo gasto (atalho: N)">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="fab-label">Novo gasto</span>
   </button>
   <button class="tab" id="tab-orcamento" onclick="switchTab('orcamento')">
     <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg>Orçamento
@@ -545,6 +665,8 @@
   <button class="tab" id="tab-ajustes" onclick="openSettings()">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ajustes
   </button>
+  <div class="side-foot" id="side-foot" onclick="openSettings()"></div>
+  <div class="side-keys">Atalhos: <b>N</b> novo gasto · <b>←</b> <b>→</b> mês</div>
 </nav>
 
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeSheet()">
@@ -704,10 +826,15 @@ function withUndo(msg, mutate) {
 // ═════════════════════════════════════════════
 // NAVEGAÇÃO
 // ═════════════════════════════════════════════
+function updatePageTitle() {
+  $('#page-title').textContent = { inicio: 'Visão geral', lancamentos: 'Lançamentos', orcamento: 'Orçamento' }[activeTab] || '';
+}
 function updateHeader() {
   const lbl = `${MONTHS[curMonth].slice(0, 3)} ${curYear}`;
   $('#monthLabel').innerHTML = isCurrentMonth() ? lbl : `${lbl}<small>voltar p/ hoje</small>`;
   $('#app-title').textContent = meta().title || '💰 Minhas Finanças';
+  $('#side-title').textContent = (meta().title || 'Minhas Finanças').replace(/^\p{Extended_Pictographic}\s*/u, '');
+  updatePageTitle();
 }
 function shiftMonth(delta) {
   const d = new Date(curYear, curMonth + delta, 1);
@@ -730,6 +857,7 @@ function switchTab(t) {
     $(`#tab-${id}`).classList.toggle('active', id === t);
   });
   $('#content').classList.remove('slide-l', 'slide-r');
+  updatePageTitle();
   window.scrollTo(0, 0);
   ANIM = true; renderTab();
 }
@@ -853,7 +981,7 @@ function insightsHTML(d, R, O, G) {
 }
 
 function donutHTML(d, G) {
-  if (!G) return `<section class="card"><div class="card-head"><span class="card-title">Para onde foi o dinheiro</span></div>
+  if (!G) return `<section class="card donut-card"><div class="card-head"><span class="card-title">Para onde foi o dinheiro</span></div>
     <div class="muted-line">Nenhum gasto lançado ainda. Toque no ＋ para começar.</div></section>`;
   const segs = d.categorias.map(c => ({ id: c.id, nome: c.nome, icon: c.icon || '📌', cor: c.cor || '#94a3b8', v: usedBy(d, c.id) })).filter(s => s.v > 0);
   const orphan = d.lancamentos.filter(l => !catOf(d, l)).reduce((s, l) => s + l.valor, 0);
@@ -870,7 +998,7 @@ function donutHTML(d, G) {
     return el;
   }).join('');
   const top = segs.slice(0, 6);
-  return `<section class="card">
+  return `<section class="card donut-card">
     <div class="card-head"><span class="card-title">Para onde foi o dinheiro</span></div>
     <div class="donut-wrap">
       <div class="donut">
@@ -928,7 +1056,7 @@ function evoHTML() {
 function recentHTML(d) {
   if (!d.lancamentos.length) return '';
   const list = [...d.lancamentos].sort((a, b) => b.data.localeCompare(a.data)).slice(0, 5);
-  return `<section class="card">
+  return `<section class="card recent-card">
     <div class="card-head"><span class="card-title">Últimos lançamentos</span><button class="link" onclick="switchTab('lancamentos')">Ver todos →</button></div>
     <div class="tx-list" style="margin:0 -16px -16px;border:none;border-top:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius)">
       ${list.map(l => txRow(l, d, true)).join('')}
@@ -1070,12 +1198,12 @@ function renderOrc() {
         <div class="plan-leg num"><span>Orçado ${brl(O)}</span><span>Receitas ${brl(R)}</span></div>
       </div>
     </section>
-    <section class="card">
+    <section class="card rec-card">
       <div class="card-head"><span class="card-title">Receitas</span><span class="card-meta num" style="color:var(--green)">${brl(R)}</span></div>
       ${receitas}
       <button class="btn-add" onclick="openSheet('receita')">＋ Adicionar receita</button>
     </section>
-    <section class="card">
+    <section class="card cats-card">
       <div class="card-head"><span class="card-title">Categorias</span><span class="card-meta num" style="color:var(--text2)">${brl(G)} / ${brl(O)}</span></div>
       ${cats}
       <button class="btn-add" onclick="openSheet('categoria')">＋ Adicionar categoria</button>
@@ -1232,6 +1360,19 @@ function closeSheet() {
   editId = null; editType = null;
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+// atalhos de teclado (computador)
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
+  if ($('#overlay').classList.contains('open') || $('#auth').classList.contains('show')) return;
+  const k = e.key.toLowerCase();
+  if (k === 'n') { e.preventDefault(); openSheet('lancamento'); }
+  else if (e.key === 'ArrowLeft') shiftMonth(-1);
+  else if (e.key === 'ArrowRight') shiftMonth(1);
+  else if (k === '1') switchTab('inicio');
+  else if (k === '2') switchTab('lancamentos');
+  else if (k === '3') switchTab('orcamento');
+});
 
 // arrastar para fechar
 (() => {
@@ -1514,8 +1655,21 @@ function setSync(st) {
   if (!dot) return;
   dot.className = 'sync-dot ' + (appMode() === 'cloud' ? st : 'hidden');
   dot.title = syncLabel();
+  renderSideFoot();
   const lbl = document.getElementById('sync-label');
   if (lbl) lbl.textContent = syncLabel();
+}
+function renderSideFoot() {
+  const el = document.getElementById('side-foot');
+  if (!el) return;
+  const dot = { ok: 'var(--green)', pending: 'var(--yellow)', syncing: 'var(--yellow)', error: 'var(--red)' }[syncState] || 'var(--text3)';
+  if (appMode() === 'cloud') {
+    const email = (user && user.email) || LS.get('fin_email') || 'Sua conta';
+    el.innerHTML = `<div class="avatar">${esc(email[0].toUpperCase())}</div>
+      <div class="account-info"><b>${esc(email)}</b><span><i style="width:7px;height:7px;border-radius:50%;background:${dot};display:inline-block"></i>${syncLabel()}</span></div>`;
+  } else {
+    el.innerHTML = `<div class="avatar">📱</div><div class="account-info"><b>Sem conta</b><span>Entrar para sincronizar</span></div>`;
+  }
 }
 function syncLabel() {
   return { ok: 'Sincronizado ✓', pending: 'Alterações aguardando envio', syncing: 'Sincronizando…', offline: 'Sem internet — salvo no aparelho', error: 'Erro ao sincronizar, tentando de novo', idle: 'Conectando…' }[syncState] || '';
@@ -1649,6 +1803,18 @@ function hideAuth() { $('#auth').classList.remove('show'); }
 function renderAuth(note) {
   const login = authTab === 'login';
   $('#auth-inner').innerHTML = `
+    <div class="auth-side">
+      <img class="auth-logo" src="apple-touch-icon.png" alt="" style="margin:0">
+      <h2>Seu dinheiro,<br><em>sob controle.</em></h2>
+      <p>Planeje o mês, lance seus gastos em segundos e veja para onde vai cada real — no celular ou no computador.</p>
+      <div class="auth-feats">
+        <div class="auth-feat"><span>📊</span>Orçamento por categoria com alertas</div>
+        <div class="auth-feat"><span>☁️</span>Sincroniza entre celular e computador</div>
+        <div class="auth-feat"><span>🔒</span>Só você tem acesso aos seus dados</div>
+        <div class="auth-feat"><span>📲</span>Instala como app, funciona offline</div>
+      </div>
+    </div>
+    <div class="auth-form">
     <img class="auth-logo" src="apple-touch-icon.png" alt="">
     <h1>${login ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
     <p class="auth-sub">${login ? 'Entre para ver suas finanças em qualquer aparelho.' : 'Seus dados ficam salvos na nuvem e sincronizados entre celular e computador.'}</p>
@@ -1666,7 +1832,8 @@ function renderAuth(note) {
     ${login ? `<div class="auth-links"><button class="link" onclick="forgotPassword()">Esqueci minha senha</button></div>` : ''}
     <div class="divider">ou</div>
     <button class="btn-ghost" onclick="useLocal()">Usar sem conta</button>
-    <div class="auth-foot">Sem conta, os dados ficam só neste aparelho.<br>Você pode criar uma conta depois em Ajustes.</div>`;
+    <div class="auth-foot">Sem conta, os dados ficam só neste aparelho.<br>Você pode criar uma conta depois em Ajustes.</div>
+    </div>`;
   $('#auth-inner').querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(); }));
 }
 function authMsg(text, kind) { const m = $('#auth-msg'); if (!m) return; m.className = 'auth-msg ' + kind; m.textContent = text; }
@@ -1676,6 +1843,9 @@ function trError(e) {
   if (/already registered|already been registered/i.test(m)) return 'Este e-mail já tem conta. Use "Entrar".';
   if (/not confirmed/i.test(m)) return 'Confirme seu e-mail antes de entrar — veja sua caixa de entrada (e o spam).';
   if (/password.*(6|characters|short)/i.test(m)) return 'A senha precisa ter pelo menos 6 caracteres.';
+  if (/email rate limit/i.test(m)) return 'O limite de e-mails de confirmação por hora foi atingido. Tente de novo mais tarde.';
+  const secs = m.match(/after (\d+) seconds/i);
+  if (secs) return `Aguarde ${secs[1]} segundos e tente de novo.`;
   if (/rate limit|too many|security purposes/i.test(m)) return 'Muitas tentativas. Aguarde um minuto e tente de novo.';
   if (/invalid.*email|email.*invalid/i.test(m)) return 'E-mail inválido.';
   if (/fetch|network/i.test(m)) return 'Sem conexão. Verifique sua internet.';
@@ -1852,7 +2022,19 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instal
 window.addEventListener('appinstalled', () => { hideBanner(); toast('App instalado ✓'); });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  const hadController = !!navigator.serviceWorker.controller;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      // procura versão nova ao abrir e sempre que o app volta para a tela
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => {});
+  });
+  // quando uma versão nova é instalada, oferece atualizar
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloading) return;
+    toast('Nova versão do app disponível', { label: 'Atualizar', fn: () => { reloading = true; location.reload(); } });
+  });
 }
 
 // ═════════════════════════════════════════════

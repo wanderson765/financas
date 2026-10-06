@@ -1,6 +1,6 @@
 // Service worker: faz o app abrir mesmo sem internet.
 // Ao mudar algo nos arquivos, aumente o número da versão abaixo.
-const VERSION = 'financas-v5';
+const VERSION = 'financas-v8';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon-32.png'];
 
 self.addEventListener('install', e => {
@@ -22,7 +22,7 @@ self.addEventListener('fetch', e => {
   // Página: tenta a internet primeiro (pega atualizações), senão usa a cópia salva
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req).then(res => {
+      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).then(res => {
         const copy = res.clone();
         caches.open(VERSION).then(c => c.put('./index.html', copy));
         return res;
